@@ -3787,6 +3787,7 @@
 
   function start() {
     if (app) return;
+    window.__agentSwarmActive = true;
     app = new App();
     app.run().catch((err) => console.error("[swarm-rebuild]", err));
   }
@@ -3795,7 +3796,9 @@
     if (!app) return;
     const a = app;
     app = null;
+    window.__agentSwarmActive = false;
     a.destroy(reveal);
+    window.dispatchEvent(new Event('lotus:swarm-exit'));
   }
 
   function restart() {
