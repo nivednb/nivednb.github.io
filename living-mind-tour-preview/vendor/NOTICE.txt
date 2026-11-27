@@ -1,0 +1,1 @@
+Swarm build engine adapted from harnoorDev/swarm-build, commit ab77869ca766da7396e1dbeb8c42b7f3d4c6e629, MIT license. Local changes add interruption cleanup and adjust section visibility handling. Simulated agents are visual effects.
