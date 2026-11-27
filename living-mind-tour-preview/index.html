@@ -68,7 +68,7 @@ const wide=matchMedia('(min-width:701px)').matches;const crew={planner:'#8ce7f7'
 function finish(focus){if(!running)return;running=false;clearTimeout(tourTimer);if(swarm)swarm.stop();document.documentElement.classList.remove('swarm-js');document.body.classList.remove('swarm-tour');window.__swarm3dActive=false;window.dispatchEvent(new Event('scroll'));panel.hidden=true;info.textContent='Simulated build tour finished.';if(focus)launch.focus({preventScroll:true})}
 function reset(){regions.forEach(r=>{r.classList.remove('swarm-done','sb-host','sb-rel');delete r.dataset.sbQueued;r.querySelectorAll('[data-swarm-step]').forEach(e=>e.classList.remove('sb-built','sb-split'))})}
 scene.addEventListener('swarm:scene',event=>{if(!running)return;let d=event.detail;window.__swarm3dActive=d.phase!=='ready';if(viewer.loaded){viewer.pause();viewer.currentTime=Math.max(0,Math.min(viewer.duration||4,(viewer.duration||4)*d.progress));}if(d.phase==='ready'){window.__swarm3dActive=false;window.dispatchEvent(new Event('scroll'))}});
-launch.addEventListener('click',async()=>{if(running||loading)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches){info.textContent='This tour uses motion; the full portfolio remains available.';return}loading=true;launch.disabled=true;info.textContent='Preparing the build tour…';let swarmBuild;try{swarmBuild=await loadBuilder()}catch(error){info.textContent='The build tour could not load; the portfolio is ready to explore.';return}finally{loading=false;launch.disabled=false}info.textContent='';reset();running=true;document.body.classList.add('swarm-tour');document.documentElement.classList.add('swarm-js');panel.hidden=false;
+launch.addEventListener('click',async()=>{if(new URLSearchParams(location.search).get('build')==='agent-swarm'||running||loading)return;if(matchMedia('(prefers-reduced-motion: reduce)').matches){info.textContent='This tour uses motion; the full portfolio remains available.';return}loading=true;launch.disabled=true;info.textContent='Preparing the build tour…';let swarmBuild;try{swarmBuild=await loadBuilder()}catch(error){info.textContent='The build tour could not load; the portfolio is ready to explore.';return}finally{loading=false;launch.disabled=false}info.textContent='';reset();running=true;document.body.classList.add('swarm-tour');document.documentElement.classList.add('swarm-js');panel.hidden=false;
 swarm=swarmBuild({force:true,once:'always',you:false,trace:false,crew,speed:1.6,sceneTimeout:4,rootMargin:'0px',onRegionStart(region){message.textContent='Building '+(region.id==='site-end'?'the closing':region.id.replaceAll('-',' '))},onRegionEnd(region){if(!running)return;let i=regions.indexOf(region);if(i<0)return;if(i===regions.length-1){tourTimer=setTimeout(()=>finish(false),700);return}tourTimer=setTimeout(()=>{if(running)regions[i+1].scrollIntoView({behavior:'smooth',block:'center'})},500)}});
 if(!swarm.active){finish(false);info.textContent='Tour unavailable with your current motion or data-saving preferences.';return}
 function point(x,y){return ()=>{let r=viewer.getBoundingClientRect();if(!viewer.loaded)return null;return {x:r.left+r.width*x,y:r.top+r.height*y}}}
@@ -78,4 +78,43 @@ swarm.anchor('outer rings',point(.8,.6),{on:scene,at:.68,by:'orbit',hold:1.0,gly
 if(wide){swarm.anchor('petal edge',point(.42,.34),{on:scene,at:.22,by:'petal',hold:.8,glyph:'pen',doing:'shaping the petal edge'});swarm.anchor('layer detail',point(.62,.55),{on:scene,at:.5,by:'facet',hold:.8,glyph:'cross',doing:'placing layer details'});swarm.anchor('final form',point(.72,.48),{on:scene,at:.8,by:'light',hold:.8,glyph:'cross',doing:'finishing the form'})}
 swarm.start();if(viewer.loaded)swarm.ready(scene);else viewer.addEventListener('load',()=>{if(running)swarm.ready(scene)},{once:true});stop.focus({preventScroll:true})});
 stop.addEventListener('click',()=>finish(true));addEventListener('keydown',e=>{if(running&&e.key==='Escape'){e.preventDefault();finish(true)}});addEventListener('wheel',()=>finish(false),{passive:true});addEventListener('touchstart',e=>{if(running&&!panel.contains(e.target))finish(false)},{passive:true});
-</script></body></html>
+</script><script type="module">
+const params = new URLSearchParams(location.search);
+if (params.get('build') === 'agent-swarm') {
+  const launch = document.querySelector('.build-launch');
+  const info = document.querySelector('#build-info');
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  launch.textContent = 'Watch Agent Swarm build';
+  window.addEventListener('lotus:swarm-handoff', () => {
+    const lotus = document.getElementById('lotus');
+    scrollTo({top: scrollY + lotus.getBoundingClientRect().top - innerHeight * .56, behavior: 'instant'});
+    lotus.setAttribute('tabindex', '-1');
+    lotus.focus({preventScroll: true});
+  });
+  launch.addEventListener('click', () => {
+    if (reducedMotion.matches) {
+      info.textContent = 'This tour uses motion. Scroll to explore the portfolio.';
+      return;
+    }
+    if (window.__swarmRebuild) {
+      window.__swarmRebuild.start();
+      return;
+    }
+    launch.disabled = true;
+    info.textContent = 'Preparing Agent Swarm…';
+    const script = document.createElement('script');
+    script.src = './vendor/agent-swarm.js';
+    script.onload = () => {
+      launch.disabled = false;
+      info.textContent = '';
+    };
+    script.onerror = () => {
+      launch.disabled = false;
+      info.textContent = 'Agent Swarm could not load. Scroll to explore the portfolio.';
+      script.remove();
+    };
+    document.head.append(script);
+  });
+}
+</script>
+</body></html>
