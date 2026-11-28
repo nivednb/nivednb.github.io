@@ -138,6 +138,7 @@ try {
   for (const control of [select,pose,offset,document.querySelector('#reset')]) {
     control.addEventListener('input', () => { if (animation) stopDemo(); });
   }
+  if (new URLSearchParams(location.search).get('tour') === '1') demo.click();
   orbit.addEventListener('change',render);
   function resize() {
     camera.aspect = host.clientWidth/host.clientHeight;
