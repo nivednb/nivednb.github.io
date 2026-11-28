@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lotus parts · Living Mind</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#090d18;color:#e3eaf6;font:16px system-ui}main{max-width:1200px;margin:auto;padding:clamp(18px,4vw,54px)}a{color:#a5dcff}h1{font-size:clamp(2rem,5vw,4rem);margin:.35em 0}.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,300px);gap:20px}.scene{height:clamp(330px,63vh,700px);background:radial-gradient(ellipse,#22283f,#0c101d 75%);border-radius:16px;overflow:hidden}canvas{display:block;touch-action:none}fieldset{border:1px solid #3b4661;border-radius:16px;padding:18px;align-self:start}label{display:block;margin:14px 0 5px}select,input{width:100%}button,select{padding:8px;border:1px solid #627394;border-radius:6px;background:#161f33;color:inherit;font:inherit}button{margin-top:14px}p{color:#becce0}@media(max-width:700px){.layout{grid-template-columns:1fr}}
+</style>
+<main><a href="../#lotus">← Lotus story</a><h1>Explore the Lotus parts</h1>
+<p>Scrub the original motion, then offset one petal or ring. Drag the view to orbit.</p>
+<div class="layout"><div id="scene" class="scene" aria-label="Interactive Lotus model"></div>
+<fieldset id="controls" disabled><legend>Part controls</legend>
+<label for="pose">Lotus pose</label><input id="pose" type="range" min="0" max="3999" value="2000">
+<label for="part">Part</label><select id="part"></select>
+<label for="offset">Offset along the Lotus axis</label><input id="offset" type="range" min="-2" max="2" step=".05" value="0">
+<button id="reset" type="button">Reset part offsets</button>
+</fieldset></div><p id="status" role="status">Loading the Lotus…</p></main>
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
+<script type="module">
+const status = document.querySelector('#status');
+try {
+  const [T, {GLTFLoader}, {OrbitControls}] = await Promise.all([
+    import('three'), import('three/addons/loaders/GLTFLoader.js'), import('three/addons/controls/OrbitControls.js')
+  ]);
+  const host = document.querySelector('#scene');
+  const renderer = new T.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 1.5));
+  host.append(renderer.domElement);
+  const scene = new T.Scene();
+  const camera = new T.PerspectiveCamera(39,1,.1,100);
+  const orbit = new OrbitControls(camera, renderer.domElement);
+  const key = new T.DirectionalLight(0xffe8cd, 3.2);
+  key.position.set(4,3,8);
+  scene.add(key,new T.HemisphereLight(0xe0eaff,0x71607f,2.4));
+  const model = await new GLTFLoader().loadAsync('/living-mind-story/assets/asura_lotus_web.glb');
+  scene.add(model.scene);
+  const clip = model.animations.find(a => a.name === 'Opening_and_exploded_reassembly_4s');
+  if (!clip) throw new Error('Missing Lotus animation');
+  const mixer = new T.AnimationMixer(model.scene);
+  mixer.clipAction(clip).play();
+  const select = document.querySelector('#part');
+  const pose = document.querySelector('#pose');
+  const offset = document.querySelector('#offset');
+  const parts = new Map();
+  const offsets = new Map();
+  model.scene.traverse(node => {
+    const ring = /^ring_(\d+)$/.exec(node.name);
+    const petal = /^petal_c(\d+)_p(\d+)$/.exec(node.name);
+    if (!ring && !petal) return;
+    const gems = ring && model.scene.getObjectByName('ring_gems_' + ring[1]);
+    parts.set(node.name, gems ? [node,gems] : [node]);
+    const label = ring ? 'Ring ' + (+ring[1]+1) : 'Crown ' + (+petal[1]+1) + ' · Petal ' + (+petal[2]+1);
+    select.add(new Option(label,node.name));
+  });
+  if (!parts.size) throw new Error('No Lotus parts found');
+  const edited = new Map();
+  const render = () => renderer.render(scene,camera);
+  function updatePose() {
+    for (const [node, position] of edited) node.position.copy(position);
+    edited.clear();
+    mixer.setTime(Number(pose.value)/1000);
+    model.scene.updateMatrixWorld(true);
+    for (const [name, distance] of offsets) {
+      for (const node of parts.get(name)) {
+        edited.set(node,node.position.clone());
+        const point = node.getWorldPosition(new T.Vector3());
+        point.z += distance;
+        node.position.copy(node.parent.worldToLocal(point));
+      }
+    }
+    render();
+  }
+  mixer.setTime(2);
+  const bounds = new T.Box3().setFromObject(model.scene);
+  const center = bounds.getCenter(new T.Vector3());
+  const diameter = bounds.getSize(new T.Vector3()).length();
+  orbit.target.copy(center);
+  camera.position.copy(center).addScaledVector(new T.Vector3(.48,.28,.83),diameter*1.7);
+  orbit.update();
+  document.querySelector('#controls').disabled = false;
+  status.textContent = parts.size + ' selectable petals and rings.';
+  select.addEventListener('change', () => { offset.value = offsets.get(select.value) ?? 0; });
+  pose.addEventListener('input',updatePose);
+  offset.addEventListener('input',() => {
+    const value = Number(offset.value);
+    if (value) offsets.set(select.value,value);
+    else offsets.delete(select.value);
+    updatePose();
+  });
+  document.querySelector('#reset').addEventListener('click',() => {
+    offsets.clear();
+    offset.value = 0;
+    updatePose();
+  });
+  orbit.addEventListener('change',render);
+  function resize() {
+    camera.aspect = host.clientWidth/host.clientHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(host.clientWidth,host.clientHeight);
+    render();
+  }
+  new ResizeObserver(resize).observe(host);
+  resize();
+} catch (error) {
+  status.textContent = 'The interactive Lotus could not load. You can return to the Lotus story.';
+  console.error(error);
+}
+</script></html>
