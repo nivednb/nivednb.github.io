@@ -79,6 +79,18 @@ main > #work {
   main > #work {grid-template-columns:1fr}
   .lotus-feature img {width:min(86%,250px)}
 }
+/* The tour uses the same viewer and backdrop as the scroll story. */
+.lotus-tour-stage {
+  position:fixed;z-index:5;left:clamp(16px,5vw,80px);bottom:clamp(16px,5vh,54px);
+  max-width:calc(100vw - 32px);padding:14px 18px;border:1px solid #b1c6f057;border-radius:12px;
+  background:#10192ee8;backdrop-filter:blur(12px);
+}
+.lotus-tour-stage p {margin:0 0 10px;color:#e3eafb}
+.lotus-tour-stage button {padding:7px 10px;border:1px solid #b1c6f080;border-radius:6px;background:#192743;color:white;font:inherit;cursor:pointer}
+.lotus-assembly-visible .journey .visual {opacity:1!important}
+.lotus-assembly-visible #lotus > .copy {visibility:hidden}
+.lotus-assembly-visible .journey model-viewer,
+.lotus-assembly-visible .journey .lotus-fallback {transform:none!important}
 </style></head><body><canvas aria-hidden="true"></canvas><header><a href="#home">LIVING / MIND</a><nav aria-label="Main"><a href="#about">About</a><a href="#interests">Interests</a><a href="#work">Projects</a><a href="#lotus">Lotus</a><a href="#explore">Explore</a><a href="#contact">Contact</a></nav></header><main><section id="home"><div class="copy"><small>Welcome · Nived Njattumparambil Bijukumar</small><h1>Engineering meets<br>imagination.</h1><p>I’m a Digital Engineering master’s student at Otto von Guericke University Magdeburg, exploring immersive technology, simulation and intelligent systems.</p><a class="cta" href="#about">Get to know me ↓</a> <a class="cta" href="https://github.com/nivednb">GitHub ↗</a><button class="build-launch" type="button" aria-describedby="build-info">Watch it build ✦</button><span id="build-info" class="build-status" aria-live="polite"></span></div></section><section id="about"><div class="copy"><small>01 — About</small><h2>Curiosity is<br>the starting point.</h2><p>My interests span digital engineering, interactive systems and the relationship between technology and human experience.</p><a class="cta" href="https://github.com/nivednb">Find my work on GitHub ↗</a></div></section><section id="interests"><div class="copy"><small>02 — Intersections</small><h2>Between science<br>and imagination.</h2><p>Spatial computing, simulation, scientific visualization and artificial intelligence.</p></div></section><section id="work"><div class="copy"><small>03 — Selected work</small><h2>From ideas to systems.</h2><p>Digital twins, interactive visualization and experimental software.</p><div class="project-list"><button data-focus="22">Power-to-Methanol digital twin</button><button data-focus="8">Medical visualization</button><button data-focus="7">Evolving neural systems</button><button data-focus="23">MyPod</button><button data-focus="24">Living Universe</button><button data-focus="">Return to overview</button></div><div class="project-detail" aria-live="polite" hidden><h3></h3><p></p><a hidden>View public repository ↗</a></div><a class="cta" href="https://github.com/nivednb">Explore repositories ↗</a></div>
 <a class="lotus-feature" href="#lotus">
   <img alt="" loading="lazy" width="200" height="127" src="data:image/webp;base64,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">
@@ -114,107 +126,108 @@ const params = new URLSearchParams(location.search);
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   launch.textContent = 'Watch Agent Swarm build';
   const assemblyEnabled = params.get('assembly') !== '0';
-  let stage;
-  function prepareAssembly() {
-    if (!assemblyEnabled || stage) return;
-    const frame = document.createElement('iframe');
-    frame.title = 'Simulated workers assemble the Lotus';
-    frame.src = './parts/?staged=1&revision=lotus-tour-2';
-    frame.style.cssText = 'width:100%;height:100%;border:0';
-    const dialog = document.createElement('dialog');
-    dialog.setAttribute('aria-label','Lotus assembly');
-    dialog.style.cssText = 'width:min(1100px,96vw);height:min(800px,92vh);padding:0;border:1px solid #627394;border-radius:14px;background:#090d18;color:white;overflow:hidden';
-    dialog.inert = true;
-    dialog.style.opacity = '0';
-    dialog.style.pointerEvents = 'none';
-    dialog.open = true;
-    dialog.append(frame);
-    document.body.append(dialog);
-    stage = {frame, dialog};
-  }
+  const viewer = document.querySelector('.journey model-viewer');
+  const chapter = document.getElementById('lotus');
+  const stage = document.createElement('aside');
+  stage.className = 'lotus-tour-stage';
+  stage.hidden = true;
+  stage.setAttribute('aria-label','Lotus assembly');
+  const caption = document.createElement('p');
+  caption.setAttribute('role','status');
+  const resume = document.createElement('button');
+  resume.type = 'button';
+  resume.textContent = 'Continue to Lotus story';
+  stage.append(caption,resume);
+  chapter.append(stage);
+  let pending = false;
+  let cancelAssembly;
   function openStory() {
-    const lotus = document.getElementById('lotus');
-    scrollTo({top: scrollY + lotus.getBoundingClientRect().top - innerHeight * .56, behavior:'instant'});
-    lotus.setAttribute('tabindex','-1');
-    lotus.focus({preventScroll:true});
+    scrollTo({top: scrollY + chapter.getBoundingClientRect().top - document.querySelector('header').offsetHeight, behavior:'instant'});
+    chapter.setAttribute('tabindex','-1');
+    chapter.focus({preventScroll:true});
     window.dispatchEvent(new Event('lotus:request-model'));
   }
   function clearAssembly() {
-    if (!stage) return;
-    clearTimeout(stage.timeout);
-    stage.dialog.remove();
-    document.body.classList.remove("lotus-assembly-visible");
-    stage = undefined;
+    pending = false;
+    cancelAssembly?.abort();
+    cancelAssembly = undefined;
+    stage.hidden = true;
+    document.body.classList.remove('lotus-assembly-visible');
+    window.__swarm3dActive = false;
+    dispatchEvent(new Event('scroll'));
   }
-  function showAssemblyFallback() {
-    clearTimeout(stage.timeout);
-    stage.frame.remove();
-    const image = document.querySelector('.lotus-fallback').cloneNode();
-    image.hidden = false;
-    image.alt = 'Lotus model';
-    image.style.cssText = 'width:100%;height:100%;object-fit:contain;padding:48px';
-    stage.dialog.prepend(image);
-    stage.status.style.cssText = 'position:absolute;inset:auto 16px 12px;margin:0;text-align:center';
-    stage.status.textContent = 'The interactive scene is unavailable. Continue to the Lotus story.';
-  }
-  function playAssembly() {
-    if (!stage?.ready || !stage.revealed || stage.played) return;
-    stage.played = true;
-    clearTimeout(stage.timeout);
-    stage.status.remove();
-    stage.frame.style.opacity = '1';
-    stage.frame.contentWindow.postMessage({type:'lotus:start',workers:stage.workers},location.origin);
-  }
-  addEventListener('message', event => {
-    if (!stage || event.source !== stage.frame.contentWindow || event.origin !== location.origin) return;
-    if (event.data?.type === 'lotus:ready') {
-      stage.ready = true;
-      playAssembly();
-    }
-    if (event.data?.type === 'lotus:failed') {
-      stage.failed = true;
-      if (stage.revealed) showAssemblyFallback();
-    }
+  resume.addEventListener('click', () => {
+    clearAssembly();
+    chapter.focus({preventScroll:true});
   });
-  addEventListener('lotus:swarm-built', () => {
-    if (stage) window.__swarmRebuild?.stop(true);
-  });
+  addEventListener('lotus:swarm-built', () => window.__swarmRebuild?.stop(true));
   addEventListener('lotus:swarm-exit', event => {
     if (!event.detail?.reveal) clearAssembly();
   });
   addEventListener('lotus:swarm-handoff', event => {
-    if (!stage) {
-      clearAssembly();
-      openStory();
-      return;
+    openStory();
+    if (!pending) return;
+    pending = false;
+    cancelAssembly = new AbortController();
+    const {signal} = cancelAssembly;
+    stage.hidden = false;
+    caption.textContent = 'Preparing the Lotus scene…';
+    window.__swarm3dActive = true;
+    document.body.classList.add('lotus-assembly-visible');
+
+    // Leave normal scrolling in control as soon as the visitor moves on.
+    addEventListener('wheel',clearAssembly,{signal,passive:true});
+    addEventListener('touchmove',clearAssembly,{signal,passive:true});
+    addEventListener('keydown', ({key}) => {
+      if (key === 'Escape') clearAssembly();
+    },{signal});
+
+    const unavailable = () => {
+      caption.textContent = 'The interactive Lotus is unavailable.';
+      document.querySelector('.journey .lotus-fallback').hidden = false;
+      window.__swarm3dActive = false;
+    };
+    const timeout = setTimeout(unavailable,12000);
+    signal.addEventListener('abort',() => clearTimeout(timeout),{once:true});
+    function play() {
+      clearTimeout(timeout);
+      if (signal.aborted) return;
+      viewer.pause();
+      const workers = event.detail?.workers ?? [];
+      const nextChapter = document.getElementById('lotus-layers');
+      const chapterTop = chapter.getBoundingClientRect().top;
+      const chapterSpan = nextChapter.getBoundingClientRect().top - chapterTop;
+      const scrollProgress = Math.max(0,Math.min(1,(innerHeight * .70 - chapterTop) / Math.max(1,chapterSpan)));
+      const opening = scrollProgress * scrollProgress * (3 - 2 * scrollProgress);
+      const labels = ['Drawing in the rings','Folding the petals','Closing the Lotus'];
+      let lastStep = -1;
+      let start;
+      function tick(now) {
+        if (signal.aborted) return;
+        start ??= now;
+        const progress = Math.min(1,(now - start) / 4200);
+        const eased = progress * progress * (3 - 2 * progress);
+        const step = Math.min(labels.length - 1,Math.floor(progress * labels.length));
+        if (step !== lastStep) {
+          const name = workers[step % workers.length];
+          caption.textContent = name ? name + ' · ' + labels[step] : labels[step];
+          lastStep = step;
+        }
+        viewer.currentTime = 2.18 + (1.82 * opening - 2.18) * eased;
+        viewer.cameraOrbit = (52 + (28 + 23 * opening - 52) * eased) + 'deg ' + (50 + (61 - 16 * opening - 50) * eased) + 'deg ' + (19 + (9 + 7.5 * opening - 19) * eased) + 'm';
+        if (progress < 1) requestAnimationFrame(tick);
+        else {
+          caption.textContent = 'Lotus assembled. Scroll to explore.';
+          window.__swarm3dActive = false;
+          dispatchEvent(new Event('scroll'));
+        }
+      }
+      requestAnimationFrame(tick);
     }
-    const {dialog, frame} = stage;
-    const close = document.createElement('button');
-    close.textContent = 'Continue to Lotus story';
-    close.style.cssText = 'position:absolute;top:8px;right:12px;z-index:2;padding:8px;color:white;background:#19233a;border:1px solid #627394;border-radius:6px;cursor:pointer';
-    const status = document.createElement('p');
-    status.setAttribute('role','status');
-    status.style.cssText = 'position:absolute;z-index:1;inset:0;display:grid;place-items:center;margin:0;pointer-events:none';
-    status.textContent = 'Preparing the Lotus scene…';
-    dialog.append(close,status);
-    frame.style.opacity = '0';
-    dialog.open = false;
-    dialog.inert = false;
-    dialog.style.opacity = '1';
-    dialog.style.pointerEvents = '';
-    dialog.showModal();
-    document.body.classList.add("lotus-assembly-visible");
-    stage.revealed = true;
-    stage.status = status;
-    stage.workers = event.detail?.workers ?? [];
-    const finish = () => { clearAssembly(); openStory(); };
-    close.addEventListener('click',finish);
-    dialog.addEventListener('cancel', event => { event.preventDefault(); finish(); });
-    if (stage.failed) {
-      showAssemblyFallback();
-    } else {
-      stage.timeout = setTimeout(showAssemblyFallback, 12000);
-      playAssembly();
+    if (viewer.loaded) play();
+    else {
+      viewer.addEventListener('load',play,{once:true,signal});
+      viewer.addEventListener('error',() => {clearTimeout(timeout);unavailable();},{once:true,signal});
     }
   });
   launch.addEventListener('click', () => {
@@ -223,7 +236,8 @@ const params = new URLSearchParams(location.search);
       return;
     }
     scrollTo({top: 0, behavior: 'instant'});
-    prepareAssembly();
+    pending = assemblyEnabled;
+    if (pending) window.dispatchEvent(new Event('lotus:request-model'));
     if (window.__swarmRebuild) {
       window.__swarmRebuild.start();
       return;
