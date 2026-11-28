@@ -100,9 +100,12 @@ try {
   worker.textContent = '✥  Builder';
   host.append(worker);
   let animation = 0;
+  let workerMarkers = [];
   function stopDemo() {
     cancelAnimationFrame(animation);
     animation = 0;
+    workerMarkers.forEach(marker => marker.remove());
+    workerMarkers = [];
     worker.style.display = 'none';
     demo.textContent = 'Watch workers assemble';
     document.querySelector('#controls').disabled = false;
@@ -120,20 +123,40 @@ try {
     demo.textContent = 'Stop assembly';
     worker.style.display = 'block';
     const started = performance.now();
-    const duration = 1600;
+    const duration = 2200;
+    const stagger = 650;
+    const markers = names.map((name,index) => {
+      const marker = worker.cloneNode();
+      marker.textContent = '✥  ' + (roster[index % roster.length] ?? 'Builder ' + (index+1)) +
+        ' · ' + Array.from(select.options).find(option => option.value === name).textContent;
+      marker.hidden = true;
+      host.append(marker);
+      return marker;
+    });
+    worker.style.display = 'none';
+    workerMarkers = markers;
     function step(now) {
       const elapsed = Math.max(0, now-started);
-      const index = Math.min(names.length-1, Math.floor(elapsed/duration));
-      const progress = Math.min(1,(elapsed-index*duration)/duration);
-      worker.textContent = '✥  ' + (roster[index % roster.length] ?? 'Builder') + ' · ' + select.querySelector('option[value="' + names[index] + '"]').textContent;
-      offsets.set(names[index], 1.4*(1-progress*progress*(3-2*progress)));
+      const progress = names.map((name,index) => {
+        const value = T.MathUtils.clamp((elapsed-index*stagger)/duration,0,1);
+        offsets.set(name,1.4*(1-value*value*(3-2*value)));
+        return value;
+      });
       updatePose();
       model.scene.updateMatrixWorld(true);
-      const point = parts.get(names[index])[0].getWorldPosition(new T.Vector3()).project(camera);
-      worker.style.left = ((point.x+1)*.5*host.clientWidth)+'px';
-      worker.style.top = ((1-point.y)*.5*host.clientHeight)+'px';
-      if (elapsed < names.length*duration) animation = requestAnimationFrame(step);
-      else { offsets.clear(); updatePose(); stopDemo(); status.textContent = 'Assembly complete. Explore the parts using the controls.'; }
+      markers.forEach((marker,index) => {
+        const point = parts.get(names[index])[0].getWorldPosition(new T.Vector3()).project(camera);
+        marker.style.display = progress[index] > 0 && progress[index] < 1 && Math.abs(point.x)<1 && Math.abs(point.y)<1 ? 'block' : 'none';
+        marker.hidden = false;
+        marker.style.left = ((point.x+1)*.5*host.clientWidth)+'px';
+        marker.style.top = ((1-point.y)*.5*host.clientHeight)+'px';
+      });
+      if (progress.every(value => value === 1)) {
+        offsets.clear();
+        updatePose();
+        stopDemo();
+        status.textContent = 'Assembly complete. Explore the parts using the controls.';
+      } else animation = requestAnimationFrame(step);
     }
     animation = requestAnimationFrame(step);
   });
