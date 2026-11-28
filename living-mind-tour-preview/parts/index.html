@@ -113,7 +113,7 @@ try {
       return;
     }
     offsets.clear();
-    const names = ['ring_0','ring_2','ring_4','petal_c00_p00','petal_c00_p02','petal_c01_p00'];
+    const names = Array.from(parts.keys()).filter(name => name.startsWith('ring_')).slice(0,3).concat(Array.from(parts.keys()).filter(name => name.startsWith('petal_')).slice(0,3));
     for (const name of names) offsets.set(name, 1.4);
     pose.value = 2000;
     demo.textContent = 'Stop assembly';
