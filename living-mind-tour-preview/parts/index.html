@@ -2,7 +2,7 @@
 <html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Lotus parts · Living Mind</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#090d18;color:#e3eaf6;font:16px system-ui}main{max-width:1200px;margin:auto;padding:clamp(18px,4vw,54px)}a{color:#a5dcff}h1{font-size:clamp(2rem,5vw,4rem);margin:.35em 0}.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,300px);gap:20px}.scene{height:clamp(330px,63vh,700px);background:radial-gradient(ellipse,#22283f,#0c101d 75%);border-radius:16px;overflow:hidden}canvas{display:block;touch-action:none}fieldset{border:1px solid #3b4661;border-radius:16px;padding:18px;align-self:start}label{display:block;margin:14px 0 5px}select,input{width:100%}button,select{padding:8px;border:1px solid #627394;border-radius:6px;background:#161f33;color:inherit;font:inherit}button{margin-top:14px}p{color:#becce0}@media(max-width:700px){.layout{grid-template-columns:1fr}}
+*{box-sizing:border-box}body{margin:0;background:#090d18;color:#e3eaf6;font:16px system-ui}main{max-width:1200px;margin:auto;padding:clamp(18px,4vw,54px)}a{color:#a5dcff}h1{font-size:clamp(2rem,5vw,4rem);margin:.35em 0}.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,300px);gap:20px}.scene{position:relative;height:clamp(330px,63vh,700px);background:radial-gradient(ellipse,#22283f,#0c101d 75%);border-radius:16px;overflow:hidden}canvas{display:block;touch-action:none}fieldset{border:1px solid #3b4661;border-radius:16px;padding:18px;align-self:start}label{display:block;margin:14px 0 5px}select,input{width:100%}button,select{padding:8px;border:1px solid #627394;border-radius:6px;background:#161f33;color:inherit;font:inherit}button{margin-top:14px}p{color:#becce0}@media(max-width:700px){.layout{grid-template-columns:1fr}}
 </style>
 <main><a href="../#lotus">← Lotus story</a><h1>Explore the Lotus parts</h1>
 <p>Scrub the original motion, then offset one petal or ring. Drag the view to orbit.</p>
@@ -12,6 +12,7 @@
 <label for="part">Part</label><select id="part"></select>
 <label for="offset">Offset along the Lotus axis</label><input id="offset" type="range" min="-2" max="2" step=".05" value="0">
 <button id="reset" type="button">Reset part offsets</button>
+<button id="demo" type="button">Watch workers assemble</button>
 </fieldset></div><p id="status" role="status">Loading the Lotus…</p></main>
 <script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 <script type="module">
@@ -90,6 +91,53 @@ try {
     offset.value = 0;
     updatePose();
   });
+
+  const demo = document.querySelector('#demo');
+  const worker = document.createElement('span');
+  worker.setAttribute('aria-hidden','true');
+  worker.style.cssText = 'position:absolute;z-index:2;pointer-events:none;color:#b8ecff;font:12px system-ui;text-shadow:0 1px 4px #000;display:none;white-space:nowrap';
+  worker.textContent = '✥  Builder';
+  host.append(worker);
+  let animation = 0;
+  function stopDemo() {
+    cancelAnimationFrame(animation);
+    animation = 0;
+    worker.style.display = 'none';
+    demo.textContent = 'Watch workers assemble';
+    document.querySelector('#controls').disabled = false;
+  }
+  demo.addEventListener('click', () => {
+    if (animation) { stopDemo(); return; }
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      status.textContent = 'Animation is disabled by your motion preference.';
+      return;
+    }
+    offsets.clear();
+    const names = ['ring_0','ring_2','ring_4','petal_c00_p00','petal_c00_p02','petal_c01_p00'];
+    for (const name of names) offsets.set(name, 1.4);
+    pose.value = 2000;
+    demo.textContent = 'Stop assembly';
+    worker.style.display = 'block';
+    const started = performance.now();
+    const duration = 1600;
+    function step(now) {
+      const elapsed = now-started;
+      const index = Math.min(names.length-1, Math.floor(elapsed/duration));
+      const progress = Math.min(1,(elapsed-index*duration)/duration);
+      offsets.set(names[index], 1.4*(1-progress*progress*(3-2*progress)));
+      updatePose();
+      model.scene.updateMatrixWorld(true);
+      const point = parts.get(names[index])[0].getWorldPosition(new T.Vector3()).project(camera);
+      worker.style.left = ((point.x+1)*.5*host.clientWidth)+'px';
+      worker.style.top = ((1-point.y)*.5*host.clientHeight)+'px';
+      if (elapsed < names.length*duration) animation = requestAnimationFrame(step);
+      else { offsets.clear(); updatePose(); stopDemo(); status.textContent = 'Assembly complete. Explore the parts using the controls.'; }
+    }
+    animation = requestAnimationFrame(step);
+  });
+  for (const control of [select,pose,offset,document.querySelector('#reset')]) {
+    control.addEventListener('input', () => { if (animation) stopDemo(); });
+  }
   orbit.addEventListener('change',render);
   function resize() {
     camera.aspect = host.clientWidth/host.clientHeight;
