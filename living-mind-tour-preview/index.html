@@ -86,30 +86,11 @@ if (params.get('build') === 'agent-swarm') {
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   launch.textContent = 'Watch Agent Swarm build';
   window.addEventListener('lotus:swarm-handoff', () => {
-    const dialog = document.createElement('dialog');
-    dialog.setAttribute('aria-label', 'Lotus assembly');
-    dialog.style.cssText = 'width:min(1100px,96vw);height:min(800px,92vh);padding:0;border:1px solid #627394;border-radius:14px;background:#090d18;color:white;overflow:hidden';
-    const close = document.createElement('button');
-    close.textContent = 'Continue to Lotus story';
-    close.style.cssText = 'position:absolute;top:8px;right:12px;z-index:2;padding:8px;color:white;background:#19233a;border:1px solid #627394;border-radius:6px;cursor:pointer';
-    const frame = document.createElement('iframe');
-    frame.title = 'Simulated workers assemble the Lotus';
-    frame.src = './parts/?tour=1&revision=510a6ab';
-    frame.style.cssText = 'width:100%;height:100%;border:0';
-    dialog.append(close, frame);
-    document.body.append(dialog);
-    const finish = () => {
-      dialog.close();
-      dialog.remove();
-      const lotus = document.getElementById('lotus');
-      scrollTo({top: scrollY + lotus.getBoundingClientRect().top - innerHeight * .56, behavior: 'instant'});
-      lotus.setAttribute('tabindex', '-1');
-      lotus.focus({preventScroll: true});
-      window.dispatchEvent(new Event('lotus:request-model'));
-    };
-    close.addEventListener('click', finish);
-    dialog.addEventListener('cancel', event => { event.preventDefault(); finish(); });
-    dialog.showModal();
+    const lotus = document.getElementById('lotus');
+    scrollTo({top: scrollY + lotus.getBoundingClientRect().top - innerHeight * .56, behavior: 'instant'});
+    lotus.setAttribute('tabindex', '-1');
+    lotus.focus({preventScroll: true});
+    window.dispatchEvent(new Event('lotus:request-model'));
   });
   launch.addEventListener('click', () => {
     if (reducedMotion.matches) {
