@@ -85,7 +85,7 @@ if (params.get('build') === 'agent-swarm') {
   const info = document.querySelector('#build-info');
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
   launch.textContent = 'Watch Agent Swarm build';
-  window.addEventListener('lotus:swarm-handoff', () => {
+  window.addEventListener('lotus:swarm-handoff', event => {
     if (params.get('assembly') === '1') {
     const dialog = document.createElement('dialog');
     dialog.setAttribute('aria-label', 'Lotus assembly');
@@ -95,7 +95,9 @@ if (params.get('build') === 'agent-swarm') {
     close.style.cssText = 'position:absolute;top:8px;right:12px;z-index:2;padding:8px;color:white;background:#19233a;border:1px solid #627394;border-radius:6px;cursor:pointer';
     const frame = document.createElement('iframe');
     frame.title = 'Simulated workers assemble the Lotus';
-    frame.src = './parts/?tour=1&revision=5a3134b';
+    const roster = new URLSearchParams({tour:'1', revision:'crew-v1'});
+    for (const name of event.detail?.workers ?? []) roster.append('worker', name);
+    frame.src = './parts/?' + roster;
     frame.style.cssText = 'width:100%;height:100%;border:0';
     dialog.append(close, frame);
     document.body.append(dialog);
@@ -132,7 +134,7 @@ if (params.get('build') === 'agent-swarm') {
     launch.disabled = true;
     info.textContent = 'Preparing Agent Swarm…';
     const script = document.createElement('script');
-    script.src = './vendor/agent-swarm.js';
+    script.src = './vendor/agent-swarm.js?revision=crew-v1';
     script.onload = () => {
       launch.disabled = false;
       info.textContent = '';

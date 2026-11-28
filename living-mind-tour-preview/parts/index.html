@@ -96,6 +96,7 @@ try {
   const worker = document.createElement('span');
   worker.setAttribute('aria-hidden','true');
   worker.style.cssText = 'position:absolute;z-index:2;pointer-events:none;color:#b8ecff;font:12px system-ui;text-shadow:0 1px 4px #000;display:none;white-space:nowrap';
+  const roster = new URLSearchParams(location.search).getAll('worker').filter(name => /^[\p{L} .-]{1,30}$/u.test(name)).slice(0,6);
   worker.textContent = '✥  Builder';
   host.append(worker);
   let animation = 0;
@@ -124,6 +125,7 @@ try {
       const elapsed = Math.max(0, now-started);
       const index = Math.min(names.length-1, Math.floor(elapsed/duration));
       const progress = Math.min(1,(elapsed-index*duration)/duration);
+      worker.textContent = '✥  ' + (roster[index % roster.length] ?? 'Builder') + ' · ' + select.querySelector('option[value="' + names[index] + '"]').textContent;
       offsets.set(names[index], 1.4*(1-progress*progress*(3-2*progress)));
       updatePose();
       model.scene.updateMatrixWorld(true);

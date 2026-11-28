@@ -3736,12 +3736,13 @@
         if (reveal) this.sfx.release();
         this.sfx.close(reveal ? 1.4 : 0.25);
       }
+      const workers = this.engine.cursors.filter(cursor => cursor.worked).slice(0,6).map(cursor => cursor.name);
       const finish = () => {
         this.dead = true;
         cancelAnimationFrame(this.raf);
         for (const u of this.unbinds || []) u();
         this.view.host.remove();
-        if (reveal) window.dispatchEvent(new Event('lotus:swarm-handoff'));
+        if (reveal) window.dispatchEvent(new CustomEvent('lotus:swarm-handoff', {detail:{workers}}));
       };
       if (reveal) {
         this.engine.releasing = true;
