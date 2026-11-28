@@ -3649,12 +3649,13 @@
 
     frame(now) {
       if (this.dead) return;
-      const dt = Math.min(0.05, (now - this.last) / 1000);
+      const elapsed = (now - this.last) / 1000;
+      const dt = Math.min(0.05, elapsed);
       this.last = now;
       try {
         if (this.tour && !this.engine.started && this.engine.ready) this.engine.start();
         this.engine.step(dt);
-        if (this.tour) this.tourStep(dt);
+        if (this.tour) this.tourStep(Math.min(0.45, elapsed));
         this.view.render(this.engine);
         if (!this._hudT || now - this._hudT > 200) {
           this._hudT = now;
