@@ -95,7 +95,7 @@ if (params.get('build') === 'agent-swarm') {
     close.style.cssText = 'position:absolute;top:8px;right:12px;z-index:2;padding:8px;color:white;background:#19233a;border:1px solid #627394;border-radius:6px;cursor:pointer';
     const frame = document.createElement('iframe');
     frame.title = 'Simulated workers assemble the Lotus';
-    const roster = new URLSearchParams({tour:'1', revision:'crew-v1'});
+    const roster = new URLSearchParams({tour:'1', revision:'crew-v2'});
     for (const name of event.detail?.workers ?? []) roster.append('worker', name);
     frame.src = './parts/?' + roster;
     frame.style.cssText = 'width:100%;height:100%;border:0';
