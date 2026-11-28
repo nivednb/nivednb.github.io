@@ -121,7 +121,7 @@ try {
     const started = performance.now();
     const duration = 1600;
     function step(now) {
-      const elapsed = now-started;
+      const elapsed = Math.max(0, now-started);
       const index = Math.min(names.length-1, Math.floor(elapsed/duration));
       const progress = Math.min(1,(elapsed-index*duration)/duration);
       offsets.set(names[index], 1.4*(1-progress*progress*(3-2*progress)));
