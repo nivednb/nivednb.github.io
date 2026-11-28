@@ -96,7 +96,8 @@ try {
   const worker = document.createElement('span');
   worker.setAttribute('aria-hidden','true');
   worker.style.cssText = 'position:absolute;z-index:2;pointer-events:none;color:#b8ecff;font:12px system-ui;text-shadow:0 1px 4px #000;display:none;white-space:nowrap';
-  const roster = new URLSearchParams(location.search).getAll('worker').filter(name => /^[\p{L} .-]{1,30}$/u.test(name)).slice(0,6);
+  const workerNames = names => names.filter(name => typeof name === 'string' && /^[\p{L} .-]{1,30}$/u.test(name)).slice(0,6);
+  let roster = workerNames(new URLSearchParams(location.search).getAll('worker'));
   worker.textContent = '✥  Builder';
   host.append(worker);
   let animation = 0;
@@ -173,8 +174,18 @@ try {
   }
   new ResizeObserver(resize).observe(host);
   resize();
+  if (new URLSearchParams(location.search).has('staged') && parent !== window) {
+    addEventListener('message', event => {
+      if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'lotus:start') return;
+      roster = workerNames(event.data.workers);
+      resize();
+      demo.click();
+    }, {once:true});
+    parent.postMessage({type:'lotus:ready'},location.origin);
+  }
 } catch (error) {
   status.textContent = 'The interactive Lotus could not load. You can return to the Lotus story.';
+  if (parent !== window) parent.postMessage({type:'lotus:failed'},location.origin);
   console.error(error);
 }
 </script></html>

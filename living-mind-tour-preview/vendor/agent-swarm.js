@@ -3728,6 +3728,7 @@
       v.root.querySelector('[data-a="tour"]').hidden = true;
       v.root.querySelector('[data-a="speed"]').hidden = true;
       this.tour = false;
+      window.dispatchEvent(new Event('lotus:swarm-built'));
     }
 
     destroy(reveal) {
@@ -3799,7 +3800,7 @@
     app = null;
     window.__agentSwarmActive = false;
     a.destroy(reveal);
-    window.dispatchEvent(new Event('lotus:swarm-exit'));
+    window.dispatchEvent(new CustomEvent('lotus:swarm-exit', {detail:{reveal}}));
   }
 
   function restart() {
